@@ -3,7 +3,7 @@ import { Header } from "./Components/Header";
 import { Homepage } from "./Components/Homepage";
 import './App.css';
 
-function App() {
+const App = () => {
   return (
     <div className="App">
       <Header />
