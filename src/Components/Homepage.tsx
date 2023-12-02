@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 
+import { RapidAPIKey, RapidAPIHost } from '../utils';
+
 interface LeagueType {
     id: number;
     logo: string;
@@ -37,7 +39,8 @@ export const Homepage: React.FC = () => {
                 date: '2023-12-01' // need to make this always be todays date
               },
             headers: {
-             
+              'X-RapidAPI-Key': RapidAPIKey,
+              'X-RapidAPI-Host': RapidAPIHost
             }
           };
           
