@@ -37,8 +37,7 @@ export const Homepage: React.FC = () => {
                 date: '2023-12-01' // need to make this always be todays date
               },
             headers: {
-              'X-RapidAPI-Key': '86a584335bmshc19523db0e51bbfp11a759jsnb08a99cb55ba',
-              'X-RapidAPI-Host': 'api-basketball.p.rapidapi.com'
+             
             }
           };
           
