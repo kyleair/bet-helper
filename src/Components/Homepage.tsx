@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
 import axios from 'axios';
+import { format } from 'date-fns';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 import { RapidAPIKey, RapidAPIHost } from '../utils';
+import { Game } from './Game';
 
 interface LeagueType {
     id: number;
@@ -11,7 +15,7 @@ interface LeagueType {
     type: string;
 }
 
-interface GamesResponse {
+export interface GamesResponse {
     country: any;
     date: Date;
     id: number;
@@ -28,6 +32,10 @@ interface GamesResponse {
 
 export const Homepage: React.FC = () => {
     const [responseData, setResponseData] = useState<GamesResponse[]>();
+    const [startDate, setStartDate] = useState<Date | null>(new Date());
+
+    const formattedDate = format(startDate ?? new Date(), 'yyyy-MM-dd');
+    const season = formatSeason(startDate ?? new Date());
 
     const onFetchDataClick = async () => {
         const options = {
@@ -36,7 +44,8 @@ export const Homepage: React.FC = () => {
             params: {
                 timezone: 'America/Toronto',
                 league: '12', // league ID for NBA from API
-                date: '2023-12-01' // need to make this always be todays date
+                date: formattedDate, 
+                season: season,
               },
             headers: {
               'X-RapidAPI-Key': RapidAPIKey,
@@ -56,10 +65,21 @@ export const Homepage: React.FC = () => {
     return(
         <div>
             <button onClick={onFetchDataClick}>fetch data</button>
-            { responseData ?
-                "responseData.response[0].league.name:" + responseData[0].league.name : <div>data is null</div>
-            }
-        
+            <div>{formattedDate} and year is {season}</div>
+            <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
+            <div style={{marginTop: "16px"}}>
+                {responseData?.map((gameData) => (
+                   <Game {...gameData}/>
+                ))}
+            </div>
         </div>
     );
 }
+
+const formatSeason = (date: Date): string => {
+    const year = format(date, 'yyyy');
+    if (date.getMonth() > 8){
+        return `${year}-${(Number(year)+1)}`
+    }
+    return `${(Number(year)-1)}-${year}`;
+};
