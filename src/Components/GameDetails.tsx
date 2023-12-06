@@ -1,8 +1,10 @@
 import React, { useState }  from 'react';
 import axios from 'axios';
-import { ODDS_API_KEY } from '../utils';
+import { ODDS_API_KEY, TeamNameToID } from '../utils';
 
-interface OutcomeType {
+import { GamePropsDisplay } from './GamePropsDisplay';
+
+export interface OutcomeType {
     name: string;
     description: string;
     price: number;
@@ -64,7 +66,7 @@ export const GameDetails: React.FC<{id: string}> = ({id}) => {
                 {gameProps ? <div>
                 {gameProps.bookmakers[0]?.markets[0]?.outcomes.map((outcome) => (
                     <div>
-                        {outcome.description} {outcome.name} {outcome.point}: {outcome.price} 
+                        <GamePropsDisplay {...outcome} homeTeamName={gameProps.home_team as keyof typeof TeamNameToID} awayTeamName={gameProps.away_team as keyof typeof TeamNameToID}/> 
                     </div>
                 ))}  </div> : <div>no props available rn</div>
             }
