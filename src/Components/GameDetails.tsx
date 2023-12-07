@@ -43,7 +43,7 @@ export const GameDetails: React.FC<{id: string}> = ({id}) => {
             params: {
               apiKey: ODDS_API_KEY,
               regions: 'us',
-              markets: 'player_points_rebounds_assists',
+              markets: 'player_points',
               oddsFormat: 'american'
             },
           };
