@@ -1,8 +1,11 @@
-import React, { useState }  from 'react';
+import React, { useState, useContext }  from 'react';
 import axios from 'axios';
 import { ODDS_API_KEY, TeamNameToID } from '../utils';
 
 import { GamePropsDisplay } from './GamePropsDisplay';
+import { Text, Button } from './StyledComponents';
+
+import { PropMarketContext } from './Homepage';
 
 export interface OutcomeType {
     name: string;
@@ -34,6 +37,7 @@ interface GameDetailsType {
 }
 
 export const GameDetails: React.FC<{id: string}> = ({id}) => {
+    const market = useContext(PropMarketContext)
     const [gameProps, setGameProps] = useState<GameDetailsType | null>(null);
 
     const getGameProps = async () => {
@@ -59,16 +63,16 @@ export const GameDetails: React.FC<{id: string}> = ({id}) => {
 
     return(
         <div>
-            <div>Game id: {id}</div>
-            Game details
-            <button onClick={getGameProps}>Click to get props</button>
+            <Text>Game id: {id}</Text>
+            <Text>Game details</Text>
+            <Button onClick={getGameProps}>Click to get props</Button>
             <div>
                 {gameProps ? <div>
                 {gameProps.bookmakers[0]?.markets[0]?.outcomes.map((outcome) => (
                     <div>
                         <GamePropsDisplay {...outcome} homeTeamName={gameProps.home_team as keyof typeof TeamNameToID} awayTeamName={gameProps.away_team as keyof typeof TeamNameToID}/> 
                     </div>
-                ))}  </div> : <div>no props available rn</div>
+                ))}  </div> : <Text>no props available rn</Text>
             }
             </div>
         </div>
