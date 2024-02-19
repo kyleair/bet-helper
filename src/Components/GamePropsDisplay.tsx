@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { RapidAPIKey, RapidAPIHost_API_NBA, TeamNameToID } from "../utils";
 import { OutcomeType } from "./GameDetails";
-import { Text, Button, Column } from './StyledComponents';
+import { Text, Button, Column, BoldText } from './StyledComponents';
 
 interface PlayerStatsType {
     assissts: number;
@@ -82,7 +82,7 @@ export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamName: keyof type
 
     return (
         <Text>
-            {description} {name} {point}: {price}  <Button onClick={getRecentGamesData}>View trends</Button>
+            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <Button onClick={getRecentGamesData}>View trends</Button>
             {recentGamesData.length ? <RecentTrends recentGamesData={recentGamesData} bet={name} point={point}/> : null}
         </Text>
     );
@@ -91,6 +91,7 @@ export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamName: keyof type
 const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, point: number}> = ({recentGamesData, bet, point}) => {
     const gamesHitOver: number = recentGamesData.filter((game) => game.points > point).length;
     const gamesHitUnder: number = recentGamesData.length - gamesHitOver;
+    const playedTenGames: boolean = recentGamesData.length > 10;
     const lastTenGames: PlayerStatsType[] = recentGamesData.slice(-10);
     const lastTenGamesHitOver: number = lastTenGames.filter((game) => game.points > point).length;
     const lastTenGamesHitUnder: number = lastTenGames.length - lastTenGamesHitOver;
@@ -98,15 +99,15 @@ const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, p
     if (bet === "Over") {
         return (
             <Column> 
-                <Text>He has hit the over in {gamesHitOver} of {recentGamesData.length} games this season ({((gamesHitOver / recentGamesData.length) * 100).toFixed(2)}%)</Text>
-                <Text>Out of the last 10 games, he has hit the over {lastTenGamesHitOver} times</Text> 
+                <Text fontWeight={700}>He has hit the over in {gamesHitOver} of {recentGamesData.length} games this season ({((gamesHitOver / recentGamesData.length) * 100).toFixed(2)}%)</Text>
+                {playedTenGames ? <Text fontWeight={700}>Out of the last 10 games, he has hit the over {lastTenGamesHitOver} times</Text> : null}
             </Column>
         )
     } else if (bet === "Under") {
         return(
             <Column>
-                <Text>He has hit the under in {gamesHitUnder} of {recentGamesData.length} games this season({((gamesHitUnder / recentGamesData.length) * 100).toFixed(2)}%)</Text>
-                <Text>Out of the last 10 games, he has hit the under {lastTenGamesHitUnder} times</Text> 
+                <Text fontWeight={700}>He has hit the under in {gamesHitUnder} of {recentGamesData.length} games this season({((gamesHitUnder / recentGamesData.length) * 100).toFixed(2)}%)</Text>
+                {playedTenGames ? <Text fontWeight={700}>Out of the last 10 games, he has hit the under {lastTenGamesHitUnder} times</Text> : null}
             </Column>
         );
     }

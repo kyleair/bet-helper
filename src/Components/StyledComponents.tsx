@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { Children } from 'react'
 import styled from 'styled-components';
 
 interface Props{
     className?: string;
     fontSize?: any;
+    fontWeight?: number;
     color?: string;
     children: React.ReactNode;
 }
@@ -16,7 +17,10 @@ const PageText:React.FC <Props> = ({className, children}) => {
 export const Text = styled(PageText)`
     color:${(props)=>props.color ? props.color :"#000000" };
     font-size: ${(props)=>props.fontSize ? props.fontSize  : "1em"}; 
+    font-weight: ${(props)=>props.fontWeight ? props.fontWeight  : "400"};
 `;
+
+export const BoldText = <Text fontWeight={700} children/>
 
 export const Button = styled.button<{ $secondary?: boolean; }>`
   background: ${props => props.$secondary ? "white" : "#0038a8"};
@@ -24,7 +28,7 @@ export const Button = styled.button<{ $secondary?: boolean; }>`
 
   font-size: 1em;
   font-weight: 550;
-  margin: 1em;
+  margin: 0 1em;
   padding: 0.25em 1em;
   border: 2px solid #0038a8;
   border-radius: 3px;
@@ -47,4 +51,5 @@ export const Row = styled.div`
     justify-content: center;
     margin: auto;
     padding: 8px;
+    align-items: center;
 `;

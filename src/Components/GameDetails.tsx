@@ -3,12 +3,14 @@ import axios from 'axios';
 import { ODDS_API_KEY, TeamNameToID } from '../utils';
 
 import { GamePropsDisplay } from './GamePropsDisplay';
-import { Text, Button } from './StyledComponents';
+import { Text, Button, Column, Row } from './StyledComponents';
 
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 
 import { PropMarketContext } from './Homepage';
+
+import styled from 'styled-components';
 
 export interface OutcomeType {
     name: string;
@@ -67,10 +69,12 @@ export const GameDetails: React.FC<{id: string}> = ({id}) => {
 
     return(
         <div>
-            <Button onClick={getGameProps}>Fetch game data</Button>
+            <Row>
+                <Button onClick={getGameProps}>Fetch game data</Button>
+            </Row>
             <div>
-                {gameProps ? 
-                    <div>
+                {gameProps?.bookmakers && gameProps.bookmakers.length > 0 ? 
+                    <Column>
                         <DropdownButton title={currentBookmaker?.title ?? "Sportsbook"}>
                             {gameProps.bookmakers.map((bookmaker) => (
                                 <Dropdown.Item onClick={() => setCurrentBookmaker(bookmaker)}>{bookmaker.title}</Dropdown.Item>
@@ -78,15 +82,20 @@ export const GameDetails: React.FC<{id: string}> = ({id}) => {
                         </DropdownButton>
                         {
                             currentBookmaker?.markets[0]?.outcomes.map((outcome) => (
-                            <div>
+                            <GamePropRow>
                                 <GamePropsDisplay {...outcome} homeTeamName={gameProps.home_team as keyof typeof TeamNameToID} awayTeamName={gameProps.away_team as keyof typeof TeamNameToID}/> 
-                            </div>
+                            </GamePropRow>
                             ))
                         } 
-                    </div> 
-                : <Text fontSize="1.3em">No data here yet</Text>
+                    </Column> 
+                : <Text fontSize="1.3em">No data for this game</Text>
             }
             </div>
         </div>
     )
 }
+
+const GamePropRow = styled(Row)`
+    border-bottom: solid #bbb 1px;
+    width: 100%;
+`;
