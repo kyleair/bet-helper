@@ -15,8 +15,7 @@ const PageText:React.FC <Props> = ({className, children}) => {
 
 export const Text = styled(PageText)`
     color:${(props)=>props.color ? props.color :"#000000" };
-    font-size: ${(props)=>props.fontSize ? props.fontSize  : "1em"
-}    
+    font-size: ${(props)=>props.fontSize ? props.fontSize  : "1em"}; 
 `;
 
 export const Button = styled.button<{ $secondary?: boolean; }>`
@@ -38,4 +37,14 @@ export const Button = styled.button<{ $secondary?: boolean; }>`
 export const Column = styled.div`
     display: flex;
     flex-direction: column;
+    margin: auto;
+    padding: 8px;
+`;
+
+export const Row = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: auto;
+    padding: 8px;
 `;

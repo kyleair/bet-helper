@@ -1,8 +1,10 @@
 import React from 'react';
-import { Text } from './StyledComponents';
+import { Text, Row } from './StyledComponents';
 
 export const Header: React.FC = () => {
     return(
-<Text fontSize="2em">Welcome to bet helper!</Text>
+        <Row>
+            <Text fontSize="2em">Welcome to bet helper!</Text>
+        </Row>
     );
 }
