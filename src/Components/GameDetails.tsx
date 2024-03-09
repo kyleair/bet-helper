@@ -1,14 +1,12 @@
-import React, { useState, useContext }  from 'react';
+import React, { useState, useMemo, createContext, useEffect }  from 'react';
 import axios from 'axios';
-import { ODDS_API_KEY, TeamNameToID } from '../utils';
+import { TeamNameToID, RapidAPIKey, RapidAPIHost_API_NBA } from '../utils';
 
 import { GamePropsDisplay } from './GamePropsDisplay';
-import { Text, Button, Column, Row } from './StyledComponents';
+import { Text, Column, Row } from './StyledComponents';
 
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-
-import { PropMarketContext } from './Homepage';
 
 import styled from 'styled-components';
 
@@ -31,7 +29,7 @@ interface BookmakerType {
     markets: MarketType[];
 }
 
-interface GameDetailsType {
+export interface GameDetailsType {
     id: string;
     sport_key: string;
     sport_title: string;
@@ -41,52 +39,157 @@ interface GameDetailsType {
     bookmakers: BookmakerType[];
 }
 
-export const GameDetails: React.FC<{id: string}> = ({id}) => {
-    const market = useContext(PropMarketContext);
-    const [gameProps, setGameProps] = useState<GameDetailsType | null>(null);
+export const BookmakerContext = createContext("Sportsbook");
+
+export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: GameDetailsType}> = ({id, isOpen, gameData}) => {
     const [currentBookmaker, setCurrentBookmaker] = useState<BookmakerType | null>(null);
 
-    const getGameProps = async () => {
+    const homeTeamId = useMemo(() => TeamNameToID[gameData?.home_team as keyof typeof TeamNameToID], [id, gameData]);
+    const awayTeamId = useMemo(() => TeamNameToID[gameData?.away_team as keyof typeof TeamNameToID], [id, gameData]);
+    const [homeTeamData, setHomeTeamData] = useState();
+    const [awayTeamData, setAwayTeamData] = useState();
+    useEffect(() => {
         const options = {
-            method: 'GET',
-            url: `https://api.the-odds-api.com/v4/sports/basketball_nba/events/${id}/odds/?`,
-            params: {
-              apiKey: ODDS_API_KEY,
-              regions: 'us',
-              markets: market,
-              oddsFormat: 'american'
-            },
-          };
+                    method: 'GET',
+                    url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
+                    params: {
+                      team: homeTeamId,
+                      season: '2023'
+                    },
+                    headers: {
+                      'X-RapidAPI-Key': RapidAPIKey,
+                      'X-RapidAPI-Host': RapidAPIHost_API_NBA
+                    }
+                  };
+                  if (isOpen && !!homeTeamId)
+                  try {
+                      axios.request(options).then((res) =>setHomeTeamData(res.data.response));
+                
+                     } catch (e) {
+
+                     }
+                    }, [homeTeamId])
+
+    useEffect(() => {
+        const options = {
+                    method: 'GET',
+                    url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
+                    params: {
+                        team: awayTeamId,
+                        season: '2023'
+                    },
+                    headers: {
+                        'X-RapidAPI-Key': RapidAPIKey,
+                        'X-RapidAPI-Host': RapidAPIHost_API_NBA
+                    }
+                    };
+                    if (isOpen && !!awayTeamId)
+                    try {
+                        axios.request(options).then((res) =>setAwayTeamData(res.data.response));
+                
+                        } catch (e) {
+
+                        }
+                    }, [awayTeamId])
+
+
+    // const { data: homeTeamData } = useQuery({
+    //     queryKey: ["homeTeamData", id],
+    //     queryFn: async (): Promise<PlayerStatsType[]> => {
+    //         const url = `https://api-nba-v1.p.rapidapi.com/players/statistics?team=${homeTeamId}&season=2023`;
+    //         const options = {
+    //             method: 'GET',
+    //             headers: {
+    //               'X-RapidAPI-Key': RapidAPIKey,
+    //               'X-RapidAPI-Host': RapidAPIHost_API_NBA
+    //             }
+    //           }
+    //          const data = await fetch(url, options) .then((res) => res.json());
+    //          return data.data.response;
+    //     },
+    //     enabled: isOpen && !!homeTeamId,
+    //     staleTime: 12000,
+    // })
+
+    // const { data: awayTeamData } = useQuery({
+    //     queryKey: ["awayTeamData", id],
+    //     queryFn: async (): Promise<PlayerStatsType[]> => {
+    //         const url = `https://api-nba-v1.p.rapidapi.com/players/statistics?team=${awayTeamId}&season=2023`;
+    //         const options = {
+    //             method: 'GET',
+    //             headers: {
+    //               'X-RapidAPI-Key': RapidAPIKey,
+    //               'X-RapidAPI-Host': RapidAPIHost_API_NBA
+    //             }
+    //           }
+    //          const data = await fetch(url, options) .then((res) => res.json());
+    //          return data.data.response;
+    //     },
+    //     enabled: isOpen && !!awayTeamId,
+        
+    // })
+
+    
+
+    // const getRecentGamesData = async () => {
+    //     const options = {
+    //         method: 'GET',
+    //         url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
+    //         params: {
+    //           team: TeamNameToID[gameData?.home_team as keyof typeof TeamNameToID],
+    //           season: '2023'
+    //         },
+    //         headers: {
+    //           'X-RapidAPI-Key': RapidAPIKey,
+    //           'X-RapidAPI-Host': RapidAPIHost_API_NBA
+    //         }
+    //       };
+
+    //       const awayOptions = {
+    //         method: 'GET',
+    //         url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
+    //         params: {
+    //           team: TeamNameToID[gameData?.away_team as keyof typeof TeamNameToID],
+    //           season: '2023'
+    //         },
+    //         headers: {
+    //           'X-RapidAPI-Key': RapidAPIKey,
+    //           'X-RapidAPI-Host': RapidAPIHost_API_NBA
+    //         }
+    //       };
           
-          try {
-              const response = await axios.request(options);
-              console.log(response.data);
-              setGameProps(response.data);
-          } catch (error) {
-              console.error(error);
-          }
-    }
+    //       try {
+    //           const response = await axios.request(options);
+    //           let playerStats = response.data.response.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
+    //           if (playerStats?.length === 0){
+    //             const awayResponse = await axios.request(awayOptions);
+    //             playerStats = awayResponse.data.response.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
+    //           }
+    //           setRecentGamesData(playerStats);
+    //       } catch (error) {
+    //           console.error(error);
+    //       }
+    // };
 
     return(
         <div>
-            <Row>
-                <Button onClick={getGameProps}>Fetch game data</Button>
-            </Row>
             <div>
-                {gameProps?.bookmakers && gameProps.bookmakers.length > 0 ? 
+                {gameData?.bookmakers && gameData.bookmakers.length > 0 ? 
                     <Column>
+                        <BookmakerContext.Provider value={currentBookmaker?.title ?? "Sportsbook"}>
                         <DropdownButton title={currentBookmaker?.title ?? "Sportsbook"}>
-                            {gameProps.bookmakers.map((bookmaker) => (
+                            {gameData.bookmakers.map((bookmaker) => (
                                 <Dropdown.Item onClick={() => setCurrentBookmaker(bookmaker)}>{bookmaker.title}</Dropdown.Item>
                             ))}
                         </DropdownButton>
                         {
                             currentBookmaker?.markets[0]?.outcomes.map((outcome) => (
                             <GamePropRow>
-                                <GamePropsDisplay {...outcome} homeTeamName={gameProps.home_team as keyof typeof TeamNameToID} awayTeamName={gameProps.away_team as keyof typeof TeamNameToID}/> 
-                            </GamePropRow>
+                                <GamePropsDisplay {...outcome} homeTeamData={homeTeamData} awayTeamData={awayTeamData}/> 
+                            </GamePropRow>                                                      
                             ))
                         } 
+                        </BookmakerContext.Provider>
                     </Column> 
                 : <Text fontSize="1.3em">No data for this game</Text>
             }

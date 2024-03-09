@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import axios from 'axios';
-import { RapidAPIKey, RapidAPIHost_API_NBA, TeamNameToID } from "../utils";
+import React, { useState, useContext, useEffect } from "react";
 import { OutcomeType } from "./GameDetails";
-import { Text, Button, Column, BoldText } from './StyledComponents';
+import { Text, Column, TextButton } from './StyledComponents';
+import { PropMarketContext } from './Homepage';
+import { BookmakerContext } from './GameDetails';
 
-interface PlayerStatsType {
-    assissts: number;
+export interface PlayerStatsType {
+    assists: number;
     blocks: number;
     defReb: number;
     fga: number;
@@ -37,53 +37,24 @@ interface PlayerStatsType {
     turnovers: number;
 }
 
-export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamName: keyof typeof TeamNameToID; awayTeamName: keyof typeof TeamNameToID; }> = ({description, point, price, name, homeTeamName, awayTeamName}) => {
-    const [recentGamesData, setRecentGamesData] = useState<PlayerStatsType[]>([]);
+export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamData?: PlayerStatsType[]; awayTeamData?: PlayerStatsType[];}> = ({description, point, price, name, homeTeamData, awayTeamData }) => {
+    const market = useContext(PropMarketContext);
+    const currentBookmaker = useContext(BookmakerContext);
+    const [showTrends, setShowTrends] = useState<boolean>(false);
+    let recentGamesData = homeTeamData?.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
+    if (recentGamesData?.length === 0){
+      recentGamesData = awayTeamData?.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
+    }
 
-    const getRecentGamesData = async () => {
-        const options = {
-            method: 'GET',
-            url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
-            params: {
-              team: TeamNameToID[homeTeamName],
-              season: '2023'
-            },
-            headers: {
-              'X-RapidAPI-Key': RapidAPIKey,
-              'X-RapidAPI-Host': RapidAPIHost_API_NBA
-            }
-          };
+    useEffect(() => {
+        setShowTrends(false);
+    }, [market, currentBookmaker]);
 
-          const awayOptions = {
-            method: 'GET',
-            url: 'https://api-nba-v1.p.rapidapi.com/players/statistics',
-            params: {
-              team: TeamNameToID[awayTeamName],
-              season: '2023'
-            },
-            headers: {
-              'X-RapidAPI-Key': RapidAPIKey,
-              'X-RapidAPI-Host': RapidAPIHost_API_NBA
-            }
-          };
-          
-          try {
-              const response = await axios.request(options);
-              let playerStats = response.data.response.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
-              if (playerStats?.length === 0){
-                const awayResponse = await axios.request(awayOptions);
-                playerStats = awayResponse.data.response.filter((gameStats: any) => `${gameStats.player.firstname} ${gameStats.player.lastname}` === description);
-              }
-              setRecentGamesData(playerStats);
-          } catch (error) {
-              console.error(error);
-          }
-    };
 
     return (
         <Text>
-            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <Button onClick={getRecentGamesData}>View trends</Button>
-            {recentGamesData.length ? <RecentTrends recentGamesData={recentGamesData} bet={name} point={point}/> : null}
+            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <TextButton onClick={() => setShowTrends(!showTrends)}>{showTrends ? "Hide trends" :"View trends"}</TextButton>
+            {showTrends && recentGamesData ? <RecentTrends recentGamesData={recentGamesData} bet={name} point={point}/> : null}
         </Text>
     );
 }
@@ -112,4 +83,9 @@ const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, p
         );
     }
     return null;
+
+    //need function to get overs, that runs same calculation (1 func) just using diff fields (call func for each field) depending on our global propmarket context - use switch
+    const getGamesHitOver = () => {
+        
+    }
 };

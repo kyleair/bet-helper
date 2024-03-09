@@ -1,4 +1,4 @@
-import React, { Children } from 'react'
+import React from 'react'
 import styled from 'styled-components';
 
 interface Props{
@@ -19,8 +19,6 @@ export const Text = styled(PageText)`
     font-size: ${(props)=>props.fontSize ? props.fontSize  : "1em"}; 
     font-weight: ${(props)=>props.fontWeight ? props.fontWeight  : "400"};
 `;
-
-export const BoldText = <Text fontWeight={700} children/>
 
 export const Button = styled.button<{ $secondary?: boolean; }>`
   background: ${props => props.$secondary ? "white" : "#0038a8"};
@@ -52,4 +50,18 @@ export const Row = styled.div`
     margin: auto;
     padding: 8px;
     align-items: center;
+`;
+
+export const TextButton = styled.button`
+background:  #ffffff;
+color: #0038a8;
+border: none;
+font-size: 1em;
+  font-weight: 550;
+  margin: 0 1em;
+  padding: 0.25em 1em;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 `;

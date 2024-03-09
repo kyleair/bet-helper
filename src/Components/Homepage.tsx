@@ -1,12 +1,13 @@
-import React, {useState, createContext} from 'react';
-import axios from 'axios';
+import React, {useState, createContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 
 import { ODDS_API_KEY } from '../utils';
 import { Game } from './Game';
-import { Button, Text, Row, Column } from './StyledComponents';
+import { Text, Row, Column } from './StyledComponents';
+import styled from 'styled-components';
 
 interface ScoresType {
     name: string; // name of team who got below score.
@@ -21,7 +22,7 @@ export interface GamesResponse {
    completed: boolean;
    home_team: string;
    away_team: string;
-   scores: ScoresType[];
+   scores: ScoresType[] | null;
 }
 
 export enum PropMarkets {
@@ -45,47 +46,43 @@ export enum PropMarkets {
 export const PropMarketContext = createContext("POINTS");
 
 export const Homepage: React.FC = () => {
-    const [responseData, setResponseData] = useState<GamesResponse[]>();
     const [currentPropMarket, setCurrentPropMarket] = useState<PropMarkets>(PropMarkets.POINTS);
 
-    const onFetchDataClick = async () => {
-        const options = {
-            method: 'GET',
-            url: 'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?',
-            params: {
-              apiKey: ODDS_API_KEY,
-            },
-          };
-          
-          try {
-              const response = await axios.request(options);
-              console.log(response.data);
-              setResponseData(response.data);
-          } catch (error) {
-              console.error(error);
-          }
-    }
+    const { data: responseData } = useQuery({
+        queryKey: ["allGames"],
+        queryFn: async (): Promise<GamesResponse[]> => {
+           const data = await fetch(`https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?&apiKey=${ODDS_API_KEY}`, {
+            method: "GET",
+           }).then((res) => res.json());
+           return data;
+        }
+    });
+
+    // const responseData= mockGamesResponse;
 
     return(
-        <PropMarketContext.Provider value={currentPropMarket}>
-            <Row>
-                <Column>
-                    <Text>Select a prop market: </Text> 
-                </Column>
-                <DropdownButton title={currentPropMarket}>
-                    {Object.values(PropMarkets).map((propMarket) => (
-                        <Dropdown.Item onClick={() => setCurrentPropMarket(propMarket)}>{propMarket}</Dropdown.Item>
-                    ))}
-                </DropdownButton>
-            </Row>
-            <Column>
-                <Button $secondary onClick={onFetchDataClick}>Fetch data</Button>
-            </Column>
-            <Column>
-                {responseData?.map((gameData) => (
-                   <Game {...gameData}/>
-                ))}
-            </Column>
-        </PropMarketContext.Provider>
+            <>
+                <Row>
+                    <Column>
+                        <Text>Select a prop market: </Text> 
+                    </Column>
+                    <DropdownButton title={currentPropMarket}>
+                        {Object.values(PropMarkets).map((propMarket) => (
+                            <Dropdown.Item onClick={() => setCurrentPropMarket(propMarket)}>{propMarket}</Dropdown.Item>
+                        ))}
+                    </DropdownButton>
+                </Row>
+                <PropMarketContext.Provider value={currentPropMarket}>
+                    <StyledColumn>
+                        {responseData?.map((gameData) => (
+                        <Game {...gameData}/>
+                        ))}
+                    </StyledColumn>
+                </PropMarketContext.Provider>
+            </>
     );
 }
+
+const StyledColumn = styled(Column)`
+    width: 50%;
+`;
