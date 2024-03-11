@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { OutcomeType } from "./GameDetails";
 import { Text, Column, TextButton } from './StyledComponents';
-import { PropMarketContext } from './Homepage';
+import { PropMarketContext, PropMarkets } from './Homepage';
 import { BookmakerContext } from './GameDetails';
 
 export interface PlayerStatsType {
@@ -53,19 +53,112 @@ export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamData?: PlayerSta
 
     return (
         <Text>
-            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <TextButton onClick={() => {setShowTrends(!showTrends); console.log("recent games", recentGamesData);}}>{showTrends ? "Hide trends" :"View trends"}</TextButton>
+            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <TextButton onClick={() => setShowTrends(!showTrends)}>{showTrends ? "Hide trends" :"View trends"}</TextButton>
             {showTrends && recentGamesData ? <RecentTrends recentGamesData={recentGamesData} bet={name} point={point}/> : null}
         </Text>
     );
 }
 
+interface Trends {
+    gamesHitOver: number;
+    lastTenGamesHitOver?: number;
+}
 const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, point: number}> = ({recentGamesData, bet, point}) => {
-    const gamesHitOver: number = recentGamesData.filter((game) => game.points > point).length;
+    const market = useContext(PropMarketContext);
+    const getGamesHitOver = (): Trends => {
+        switch (market) {
+            case PropMarkets.POINTS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points > point).length : undefined,
+                }
+
+            case PropMarkets.REBOUNDS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.totReb > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.totReb > point).length : undefined,
+                }
+            
+            case PropMarkets.ASSISTS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.assists > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.assists > point).length : undefined,
+                };
+            case PropMarkets.THREES:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.tpm > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.tpm > point).length : undefined,
+                };
+            case PropMarkets.BLOCKS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.blocks > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.blocks > point).length : undefined,
+                };
+            case PropMarkets.STEALS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.steals > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.steals > point).length : undefined,
+                };
+            case PropMarkets.BLOCKS_STEALS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.blocks + game.steals > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.blocks + game.steals > point).length : undefined,
+                };
+            case PropMarkets.TURNOVERS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.turnovers > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.turnovers > point).length : undefined,
+                };
+            case PropMarkets.POINTS_REBOUNDS_ASSISTS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points + game.totReb + game.assists > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points + game.totReb + game.assists > point).length : undefined,
+                };
+            case PropMarkets.POINTS_REBOUNDS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points + game.totReb > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points + game.totReb > point).length : undefined,
+                };
+            case PropMarkets.POINTS_ASSISTS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points + game.assists > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points + game.assists > point).length : undefined,
+                };
+            case PropMarkets.REBOUNDS_ASSISTS:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.totReb + game.assists > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.totReb + game.assists > point).length : undefined,
+                };
+            case PropMarkets.FIRST_BASKET:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points > point).length : undefined,
+                };
+            case PropMarkets.DOUBLE_DOUBLE:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points > point).length : undefined,
+                };
+            case PropMarkets.TRIPLE_DOUBLE:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points > point).length : undefined,
+                };
+            case undefined:
+                return {
+                    gamesHitOver: recentGamesData.filter((game) => game.points > point).length,
+                    lastTenGamesHitOver: recentGamesData.length >= 10 ? recentGamesData.slice(-10).filter((game) => game.points > point).length : undefined,
+                };
+        }
+    }
+    // const gamesHitOver: number = recentGamesData.filter((game) => game.points > point).length;
+    const { gamesHitOver, lastTenGamesHitOver } = getGamesHitOver();
     const gamesHitUnder: number = recentGamesData.length - gamesHitOver;
     const playedTenGames: boolean = recentGamesData.length > 10;
     const lastTenGames: PlayerStatsType[] = recentGamesData.slice(-10);
-    const lastTenGamesHitOver: number = lastTenGames.filter((game) => game.points > point).length;
-    const lastTenGamesHitUnder: number = lastTenGames.length - lastTenGamesHitOver;
+    // const lastTenGamesHitOver: number = lastTenGames.filter((game) => game.points > point).length;
+    const lastTenGamesHitUnder: number | undefined = lastTenGamesHitOver ? lastTenGames.length - lastTenGamesHitOver : undefined;
+    
 
 
     if (bet === "Over") {
@@ -86,7 +179,4 @@ const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, p
     return null;
 
     //need function to get overs, that runs same calculation (1 func) just using diff fields (call func for each field) depending on our global propmarket context - use switch
-    const getGamesHitOver = () => {
-        
-    }
 };

@@ -43,7 +43,7 @@ export enum PropMarkets {
     TRIPLE_DOUBLE = 'player_triple_double',
 }
 
-export const PropMarketContext = createContext("POINTS");
+export const PropMarketContext = createContext(PropMarkets.POINTS);
 
 export const Homepage: React.FC = () => {
     const [currentPropMarket, setCurrentPropMarket] = useState<PropMarkets>(PropMarkets.POINTS);

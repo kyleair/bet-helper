@@ -37,6 +37,10 @@ export const Game: React.FC<GamesResponse> = ({home_team, away_team, id, commenc
             }
     }, [memoId, market, isOpen])
 
+    useEffect(() => {
+        setIsOpen(false);
+    }, [market])
+
     return(
         <GameColumn>
             <Accordion>

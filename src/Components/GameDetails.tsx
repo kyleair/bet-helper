@@ -62,7 +62,7 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                       'X-RapidAPI-Host': RapidAPIHost_API_NBA
                     }
                   };
-                  if (isOpen && !!homeTeamId )
+                  if (isOpen && !!homeTeamId && !homeTeamData)
                   try {
                       axios.request(options).then((res) =>setHomeTeamData(res.data.response));
                 
@@ -86,7 +86,7 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                     }
                     };
                     
-                    if (isOpen && !!awayTeamId)
+                    if (isOpen && !!awayTeamId && !awayTeamData)
                     try {
                         axios.request(options).then((res) =>setAwayTeamData(res.data.response));  
                         } catch (e) {
@@ -109,7 +109,7 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                         </DropdownButton>
                         {
                             currentBookmaker?.markets[0]?.outcomes.map((outcome, index) => (
-                            <GamePropRow key={`${outcome.description}-${outcome.name}-${index}`}>
+                            <GamePropRow key={`${outcome.description}-${outcome.name}-${index}}`}>
                                 <GamePropsDisplay {...outcome} homeTeamData={homeTeamData} awayTeamData={awayTeamData}/> 
                             </GamePropRow>                                                      
                             ))
