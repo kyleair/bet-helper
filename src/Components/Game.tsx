@@ -1,6 +1,6 @@
 import React, {useMemo, useState, useContext, useEffect } from 'react';
 import { GamesResponse } from './Homepage';
-import { GameDetails } from './GameDetails';
+import { GameDetails, GameDetailsType } from './GameDetails';
 import { Text, Column, Row } from './StyledComponents';
 import Accordion from 'react-bootstrap/Accordion';
 import styled from 'styled-components';
@@ -12,11 +12,10 @@ import axios from 'axios';
 
 export const Game: React.FC<GamesResponse> = ({home_team, away_team, id, commence_time}) => {
     const market = useContext(PropMarketContext);
-    const memoMarket = useMemo(() => market, [market]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const memoId = useMemo(() => id, [id]);
     const date = new Date(commence_time);
-    const [gameData, setGameData] = useState();
+    const [gameData, setGameData] = useState<GameDetailsType | undefined>(); 
 
     useEffect(() => {
         const options = {
@@ -25,18 +24,18 @@ export const Game: React.FC<GamesResponse> = ({home_team, away_team, id, commenc
             params: {
                 apiKey: ODDS_API_KEY,
                 regions: "us",
-                markets: memoMarket,
+                markets: market,
                 oddsFormat: "american",
             },
             }; 
-            if (isOpen && memoId && memoMarket && !gameData) {
+            if (isOpen && memoId && market && gameData?.bookmakers[0]?.markets[0]?.key !== market) {
                 try {
                     axios.request(options).then((res) =>setGameData(res.data));
                     } catch (e) {
 
                     }  
             }
-    }, [isOpen, memoId])
+    }, [memoId, market, isOpen])
 
     return(
         <GameColumn>
@@ -49,7 +48,7 @@ export const Game: React.FC<GamesResponse> = ({home_team, away_team, id, commenc
                         </HeaderRow>
                     </Accordion.Header>
                     <Accordion.Body>
-                        <GameDetails id={memoId} isOpen={isOpen} gameData={gameData}/>
+                        <GameDetails id={memoId} isOpen={isOpen} gameData={gameData} key={gameData?.bookmakers[0]?.markets[0].key} />
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>

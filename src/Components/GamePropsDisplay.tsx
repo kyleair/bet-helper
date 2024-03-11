@@ -53,7 +53,7 @@ export const GamePropsDisplay: React.FC<OutcomeType & { homeTeamData?: PlayerSta
 
     return (
         <Text>
-            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <TextButton onClick={() => setShowTrends(!showTrends)}>{showTrends ? "Hide trends" :"View trends"}</TextButton>
+            {description} {name} {point}: {price > 0 ? "+" : ""}{price}  <TextButton onClick={() => {setShowTrends(!showTrends); console.log("recent games", recentGamesData);}}>{showTrends ? "Hide trends" :"View trends"}</TextButton>
             {showTrends && recentGamesData ? <RecentTrends recentGamesData={recentGamesData} bet={name} point={point}/> : null}
         </Text>
     );
@@ -66,6 +66,7 @@ const RecentTrends: React.FC<{recentGamesData: PlayerStatsType[], bet: string, p
     const lastTenGames: PlayerStatsType[] = recentGamesData.slice(-10);
     const lastTenGamesHitOver: number = lastTenGames.filter((game) => game.points > point).length;
     const lastTenGamesHitUnder: number = lastTenGames.length - lastTenGamesHitOver;
+
 
     if (bet === "Over") {
         return (

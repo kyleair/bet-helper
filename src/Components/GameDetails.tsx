@@ -1,7 +1,7 @@
-import React, { useState, useMemo, createContext, useEffect }  from 'react';
+import React, { useState, useMemo, createContext, useEffect, useContext }  from 'react';
 import axios from 'axios';
 import { TeamNameToID, RapidAPIKey, RapidAPIHost_API_NBA } from '../utils';
-
+import { PropMarketContext } from './Homepage';
 import { GamePropsDisplay } from './GamePropsDisplay';
 import { Text, Column, Row } from './StyledComponents';
 
@@ -42,6 +42,7 @@ export interface GameDetailsType {
 export const BookmakerContext = createContext("Sportsbook");
 
 export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: GameDetailsType}> = ({id, isOpen, gameData}) => {
+    const market = useContext(PropMarketContext);
     const [currentBookmaker, setCurrentBookmaker] = useState<BookmakerType | null>(null);
 
     const homeTeamId = useMemo(() => TeamNameToID[gameData?.home_team as keyof typeof TeamNameToID], [id, gameData]);
@@ -61,14 +62,15 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                       'X-RapidAPI-Host': RapidAPIHost_API_NBA
                     }
                   };
-                  if (isOpen && !!homeTeamId)
+                  if (isOpen && !!homeTeamId )
                   try {
                       axios.request(options).then((res) =>setHomeTeamData(res.data.response));
                 
                      } catch (e) {
 
                      }
-                    }, [homeTeamId])
+                    }, [market])
+                   
 
     useEffect(() => {
         const options = {
@@ -83,16 +85,17 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                         'X-RapidAPI-Host': RapidAPIHost_API_NBA
                     }
                     };
+                    
                     if (isOpen && !!awayTeamId)
                     try {
-                        axios.request(options).then((res) =>setAwayTeamData(res.data.response));
-                
+                        axios.request(options).then((res) =>setAwayTeamData(res.data.response));  
                         } catch (e) {
 
                         }
-                    }, [awayTeamId])
+                    }, [market])
 
 
+    // const outcomes = useMemo(() => currentBookmaker?.markets[0]?.outcomes, [market, currentBookmaker]);
     return(
         <div>
             <div>
@@ -100,13 +103,13 @@ export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: Game
                     <Column>
                         <BookmakerContext.Provider value={currentBookmaker?.title ?? "Sportsbook"}>
                         <DropdownButton title={currentBookmaker?.title ?? "Sportsbook"}>
-                            {gameData.bookmakers.map((bookmaker) => (
-                                <Dropdown.Item onClick={() => setCurrentBookmaker(bookmaker)}>{bookmaker.title}</Dropdown.Item>
+                            {gameData.bookmakers.map((bookmaker, index) => (
+                                <Dropdown.Item onClick={() => setCurrentBookmaker(bookmaker)} key={`${bookmaker.key}-${index}`}>{bookmaker.title}</Dropdown.Item>
                             ))}
                         </DropdownButton>
                         {
-                            currentBookmaker?.markets[0]?.outcomes.map((outcome) => (
-                            <GamePropRow>
+                            currentBookmaker?.markets[0]?.outcomes.map((outcome, index) => (
+                            <GamePropRow key={`${outcome.description}-${outcome.name}-${index}`}>
                                 <GamePropsDisplay {...outcome} homeTeamData={homeTeamData} awayTeamData={awayTeamData}/> 
                             </GamePropRow>                                                      
                             ))

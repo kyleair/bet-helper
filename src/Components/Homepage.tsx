@@ -58,8 +58,6 @@ export const Homepage: React.FC = () => {
         }
     });
 
-    // const responseData= mockGamesResponse;
-
     return(
             <>
                 <Row>
@@ -68,14 +66,14 @@ export const Homepage: React.FC = () => {
                     </Column>
                     <DropdownButton title={currentPropMarket}>
                         {Object.values(PropMarkets).map((propMarket) => (
-                            <Dropdown.Item onClick={() => setCurrentPropMarket(propMarket)}>{propMarket}</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setCurrentPropMarket(propMarket)} key={propMarket}>{propMarket}</Dropdown.Item>
                         ))}
                     </DropdownButton>
                 </Row>
                 <PropMarketContext.Provider value={currentPropMarket}>
                     <StyledColumn>
                         {responseData?.map((gameData) => (
-                        <Game {...gameData}/>
+                        <Game {...gameData} key={gameData.id}/>
                         ))}
                     </StyledColumn>
                 </PropMarketContext.Provider>
