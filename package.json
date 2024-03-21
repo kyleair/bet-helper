@@ -2,6 +2,7 @@
   "name": "bet-helper",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@tanstack/react-query": "^5.22.2",
     "@testing-library/jest-dom": "^5.14.1",
