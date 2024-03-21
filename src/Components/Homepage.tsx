@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 
-import { ODDS_API_KEY } from '../utils';
 import { Game } from './Game';
 import { Text, Row, Column } from './StyledComponents';
 import styled from 'styled-components';
@@ -13,6 +12,8 @@ interface ScoresType {
     name: string; // name of team who got below score.
     score: string; // number as a string
 }
+
+const ODDS_API_KEY = process.env.REACT_APP_ODDS_API_KEY;
 
 export interface GamesResponse {
    id: string;

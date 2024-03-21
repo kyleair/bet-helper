@@ -1,6 +1,6 @@
 import React, { useState, useMemo, createContext, useEffect, useContext }  from 'react';
 import axios from 'axios';
-import { TeamNameToID, RapidAPIKey, RapidAPIHost_API_NBA } from '../utils';
+import { TeamNameToID } from '../utils';
 import { PropMarketContext } from './Homepage';
 import { GamePropsDisplay } from './GamePropsDisplay';
 import { Text, Column, Row } from './StyledComponents';
@@ -39,6 +39,8 @@ export interface GameDetailsType {
     bookmakers: BookmakerType[];
 }
 
+const RapidAPIKey = process.env.REACT_APP_RapidAPIKey;
+const RapidAPIHost_API_NBA = process.env.REACT_APP_RapidAPIHost_API_NBA;
 export const BookmakerContext = createContext("Sportsbook");
 
 export const GameDetails: React.FC<{id: string, isOpen: boolean, gameData?: GameDetailsType}> = ({id, isOpen, gameData}) => {

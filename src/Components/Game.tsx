@@ -5,10 +5,10 @@ import { Text, Column, Row } from './StyledComponents';
 import Accordion from 'react-bootstrap/Accordion';
 import styled from 'styled-components';
 import { format } from 'date-fns';
-import { ODDS_API_KEY } from '../utils';
 import { PropMarketContext } from './Homepage';
 import axios from 'axios';
 
+const ODDS_API_KEY = process.env.REACT_APP_ODDS_API_KEY;
 
 export const Game: React.FC<GamesResponse> = ({home_team, away_team, id, commence_time}) => {
     const market = useContext(PropMarketContext);
